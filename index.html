@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I Love U - Sesadhi✨</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(ellipse at bottom, #0b1a2d 0%, #000 100%);
+      overflow: hidden;
+      cursor: default; /* Normal cursor */
+      font-family: 'Arial', sans-serif;
+    }
+    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <script>
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let mouseX = 0, mouseY = 0;
+
+    // *** BACKGROUND STARS (TRAIL CURSOR!) ***
+    let bgStars = [];
+    for (let i = 0; i < 600; i++) {
+      bgStars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.8,
+        alpha: Math.random(),
+        speed: Math.random() * 0.03 + 0.005,
+        hue: Math.random() * 60 + 300,
+        targetX: Math.random() * canvas.width,
+        targetY: Math.random() * canvas.height,
+        trailSpeed: Math.random() * 0.02 + 0.005
+      });
+    }
+
+    // *** SHOOTING STARS ***
+    let shootingStars = [];
+    function createShootingStar() {
+      shootingStars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height / 2,
+        length: Math.random() * 100 + 60,
+        speed: Math.random() * 12 + 8,
+        opacity: 1,
+        hue: Math.random() * 20 + 340
+      });
+      setTimeout(createShootingStar, Math.random() * 2500 + 2000);
+    }
+    createShootingStar();
+
+    // *** STAR RAIN ***
+    let starRain = [];
+    function createRainDrop() {
+      for (let i = 0; i < 3; i++) {
+        starRain.push({
+          x: Math.random() * canvas.width,
+          y: -10,
+          speed: Math.random() * 2 + 1,
+          size: Math.random() * 1.5 + 0.5,
+          alpha: 1,
+          sway: (Math.random() - 0.5) * 0.5
+        });
+      }
+      setTimeout(createRainDrop, 80);
+    }
+    createRainDrop();
+
+    // *** LETTERS: SESADHI + MODAS ***
+    const letters = {
+      "S": [[0,0],[2,0],[8,0],[10,0],[0,2],[0,8],[0,10],[2,10],[8,10],[10,10],[10,12],[10,18],[10,20],[0,20],[2,20],[8,20]],
+      "E": [[0,0],[2,0],[8,0],[10,0],[0,2],[0,8],[0,10],[2,10],[8,10],[10,10],[0,12],[0,18],[0,20],[2,20],[8,20],[10,20]],
+      "A": [[5,0],[4,2],[6,2],[0,8],[0,10],[2,10],[8,10],[10,10],[10,8],[0,12],[0,18],[0,20],[10,12],[10,18],[10,20],[4,10],[6,10]],
+      "D": [[0,0],[0,2],[0,8],[0,10],[0,12],[0,18],[0,20],[2,0],[8,0],[10,2],[10,8],[10,12],[8,20],[2,20],[5,5],[5,15]],
+      "H": [[0,0],[0,2],[0,8],[0,10],[0,12],[0,18],[0,20],[10,0],[10,2],[10,8],[10,10],[10,12],[10,18],[10,20],[2,10],[8,10]],
+      "I": [[2,0],[5,0],[8,0],[2,10],[5,10],[8,10],[2,20],[5,20],[8,20],[5,2],[5,8],[5,12],[5,18]],
+      // *** NEW: M, O ***
+      "M": [[0,0],[0,5],[0,10],[5,5],[10,0],[10,5],[10,10],[0,20],[10,20]],
+      "O": [[2,0],[8,0],[10,2],[10,8],[10,12],[10,18],[8,20],[2,20],[0,18],[0,12],[0,8],[0,2]]
+    };
+
+    // *** TWO WORDS ***
+    const sesadhiWord = "SESADHI".split("");
+    const modasWord = "MODAS".split("");
+    
+    const sesadhiPositions = sesadhiWord.map(() => ({
+      x: Math.random() * (canvas.width - 300) + 150,
+      y: Math.random() * 150 + 50,  // Top section
+      glow: 0
+    }));
+
+    const modasPositions = modasWord.map(() => ({
+      x: Math.random() * (canvas.width - 200) + 100,
+      y: Math.random() * 100 + canvas.height - 250,  // Bottom section
+      glow: 0
+    }));
+
+    const bottomText = "Lots of love from Minindu";
+    let bottomTextX = canvas.width / 2;
+    let bottomTextY = canvas.height - 50;
+
+    // *** CURSOR TRAIL ***
+    canvas.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX; 
+      mouseY = e.clientY;
+      
+      // Make 20 existing stars follow cursor
+      for (let i = 0; i < 20; i++) {
+        const starIndex = (Date.now() * 0.001 + i) % bgStars.length | 0;
+        bgStars[starIndex].targetX = mouseX + (Math.random() - 0.5) * 100;
+        bgStars[starIndex].targetY = mouseY + (Math.random() - 0.5) * 100;
+        bgStars[starIndex].hue = 340; // Pink!
+      }
+    });
+
+    canvas.addEventListener('click', (e) => {
+      // *** CLICK = STAR EXPLOSION (no hearts) ***
+      for (let i = 0; i < 30; i++) {
+        const starIndex = (Date.now() * 0.001 + i) % bgStars.length | 0;
+        bgStars[starIndex].targetX = e.clientX + (Math.random() - 0.5) * 150;
+        bgStars[starIndex].targetY = e.clientY + (Math.random() - 0.5) * 150;
+        bgStars[starIndex].hue = 340;
+        bgStars[starIndex].alpha = 1;
+      }
+      
+      // Glow SESADHI
+      sesadhiWord.forEach((letter, li) => {
+        const pos = sesadhiPositions[li];
+        const dist = Math.hypot(e.clientX - pos.x, e.clientY - pos.y);
+        if (dist < 100) sesadhiPositions[li].glow = 1;
+      });
+      
+      // Glow MODAS
+      modasWord.forEach((letter, li) => {
+        const pos = modasPositions[li];
+        const dist = Math.hypot(e.clientX - pos.x, e.clientY - pos.y);
+        if (dist < 100) modasPositions[li].glow = 1;
+      });
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      // Star explosion on touch
+      for (let i = 0; i < 30; i++) {
+        const starIndex = (Date.now() * 0.001 + i) % bgStars.length | 0;
+        bgStars[starIndex].targetX = touch.clientX + (Math.random() - 0.5) * 150;
+        bgStars[starIndex].targetY = touch.clientY + (Math.random() - 0.5) * 150;
+        bgStars[starIndex].hue = 340;
+        bgStars[starIndex].alpha = 1;
+      }
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const time = Date.now() * 0.001;
+
+      // *** DRAW BACKGROUND STARS (TRAILING) ***
+      bgStars.forEach(star => {
+        star.x += (star.targetX - star.x) * star.trailSpeed;
+        star.y += (star.targetY - star.y) * star.trailSpeed;
+        
+        star.alpha += star.speed * (Math.random() > 0.5 ? 1 : -1);
+        if (star.alpha < 0.1) star.alpha = 0.1;
+        if (star.alpha > 1) star.alpha = 1;
+        
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${star.hue + Math.sin(time * 2) * 10}, 70%, 90%, ${star.alpha})`;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = `hsla(${star.hue}, 70%, 90%, 0.8)`;
+        ctx.fill();
+      });
+
+      // *** DRAW STAR RAIN ***
+      starRain.forEach((drop, i) => {
+        const swayX = Math.sin(drop.y * 0.01 + time) * 20;
+        ctx.beginPath();
+        ctx.arc(drop.x + swayX, drop.y, drop.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${drop.alpha})`;
+        ctx.shadowBlur = 3;
+        ctx.fill();
+        
+        drop.y += drop.speed;
+        drop.alpha -= 0.005;
+        if (drop.y > canvas.height || drop.alpha <= 0) starRain.splice(i, 1);
+      });
+
+      // *** DRAW SESADHI (TOP) ***
+      sesadhiWord.forEach((letter, li) => {
+        const shape = letters[letter];
+        const pos = sesadhiPositions[li];
+        if (pos.glow) pos.glow = Math.max(0, pos.glow - 0.02);
+        shape.forEach((point) => {
+          const px = pos.x + point[0] * 5;
+          const py = pos.y + point[1] * 5;
+          const glowIntensity = pos.glow * 0.8 + 0.5;
+          ctx.beginPath();
+          ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(340, 80%, 90%, ${glowIntensity})`;
+          ctx.shadowBlur = 15 + pos.glow * 20;
+          ctx.shadowColor = `hsla(340, 80%, 90%, ${glowIntensity * 0.6})`;
+          ctx.fill();
+        });
+      });
+
+      // *** DRAW MODAS (BOTTOM) ***
+      modasWord.forEach((letter, li) => {
+        const shape = letters[letter];
+        const pos = modasPositions[li];
+        if (pos.glow) pos.glow = Math.max(0, pos.glow - 0.02);
+        shape.forEach((point) => {
+          const px = pos.x + point[0] * 5;
+          const py = pos.y + point[1] * 5;
+          const glowIntensity = pos.glow * 0.8 + 0.5;
+          ctx.beginPath();
+          ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(340, 80%, 90%, ${glowIntensity})`;
+          ctx.shadowBlur = 15 + pos.glow * 20;
+          ctx.shadowColor = `hsla(340, 80%, 90%, ${glowIntensity * 0.6})`;
+          ctx.fill();
+        });
+      });
+
+      // *** BOTTOM TEXT ***
+      ctx.font = '18px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = `hsla(340, 80%, 95%, 0.9)`;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = `hsla(340, 80%, 95%, 0.7)`;
+      ctx.fillText(bottomText, bottomTextX, bottomTextY);
+
+      // *** SHOOTING STARS ***
+      for (let i = shootingStars.length - 1; i >= 0; i--) {
+        let s = shootingStars[i];
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x - s.length, s.y + s.length);
+        ctx.strokeStyle = `hsla(${s.hue}, 80%, 95%, ${s.opacity})`;
+        ctx.lineWidth = 3;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `hsla(${s.hue}, 80%, 95%, ${s.opacity * 0.5})`;
+        ctx.stroke();
+        s.x -= s.speed;
+        s.y += s.speed;
+        s.opacity -= 0.008;
+        if (s.opacity <= 0 || s.x < -100) shootingStars.splice(i, 1);
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    // *** RESIZE ***
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      bgStars = [];
+      for (let i = 0; i < 600; i++) {
+        bgStars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.8,
+          alpha: Math.random(),
+          speed: Math.random() * 0.03 + 0.005,
+          hue: Math.random() * 60 + 300,
+          targetX: Math.random() * canvas.width,
+          targetY: Math.random() * canvas.height,
+          trailSpeed: Math.random() * 0.02 + 0.005
+        });
+      }
+      sesadhiPositions.forEach(pos => {
+        pos.x = Math.random() * (canvas.width - 300) + 150;
+        pos.y = Math.random() * 150 + 50;
+        pos.glow = 0;
+      });
+      modasPositions.forEach(pos => {
+        pos.x = Math.random() * (canvas.width - 200) + 100;
+        pos.y = Math.random() * 100 + canvas.height - 250;
+        pos.glow = 0;
+      });
+      bottomTextX = canvas.width / 2;
+      bottomTextY = canvas.height - 50;
+    });
+
+    setTimeout(() => {
+      // Welcome star explosion
+      for (let i = 0; i < 50; i++) {
+        const starIndex = i % bgStars.length;
+        bgStars[starIndex].targetX = canvas.width / 2 + (Math.random() - 0.5) * 200;
+        bgStars[starIndex].targetY = canvas.height / 2 + (Math.random() - 0.5) * 200;
+        bgStars[starIndex].hue = 340;
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
